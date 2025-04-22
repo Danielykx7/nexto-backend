@@ -1,14 +1,15 @@
+// src/modules/promo-bar/service.ts
 import { MedusaService } from "@medusajs/framework/utils"
 import PromoBanner from "./models/promo-banner"
 
-class PromoBarService extends MedusaService({ PromoBanner }) {
+export default class PromoBarService extends MedusaService({ PromoBanner }) {
   /**
-   * Vrátí jen obdobně jako u slevu aktivní bannery
-   * mezi starts_at a ends_at, seřazené podle priority.
+   * Vrátí pouze bannery, které právě běží (mezi starts_at a ends_at),
+   * seřazené dle priority.
    */
   async listActive() {
     const now = new Date()
-    return this.list({
+    return this.listPromoBanners({
       where: {
         starts_at: { lte: now },
         ends_at:   { gte: now },
@@ -17,5 +18,3 @@ class PromoBarService extends MedusaService({ PromoBanner }) {
     })
   }
 }
-
-export default PromoBarService
