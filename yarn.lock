@@ -1919,18 +1919,23 @@
     tailwindcss "^3.3.6"
     vite "^5.4.14"
 
-"@medusajs/admin-sdk@2.7.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/admin-sdk/-/admin-sdk-2.7.0.tgz#98d25a500b84a28146d582248efe45018367dd60"
-  integrity sha512-Fc0Dgd3TMzOE1oUW3GQXUbpEWoVhTdPtOFpbAjH1M7boWrX7f/u037UbhAx72MvLtqg+NB4QbMMSskLk8BD64A==
+"@medusajs/admin-sdk@^2.7.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@medusajs/admin-sdk/-/admin-sdk-2.7.1.tgz#4f88e7bfc6d42960d0e0583b672bfe4365e9cc42"
+  integrity sha512-eGOB0TZfPMiRlQAaheXKeMEe/bhvrrdJX3DAvvyH+UgF4c8XWuqxVmbrdAe0gLHJQ1JcVYpquYSWhnsncFZcfA==
   dependencies:
-    "@medusajs/admin-shared" "2.7.0"
+    "@medusajs/admin-shared" "2.7.1"
     zod "3.22.4"
 
 "@medusajs/admin-shared@2.7.0":
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@medusajs/admin-shared/-/admin-shared-2.7.0.tgz#1766f1fd78627fb8374a2356f261ec881f88f9f5"
   integrity sha512-jAfvD1x0OrH00w5B+86vFsw1RwFiYUaZMWwSZeYWF/oTzqYQk6wybyodfj+WQHu3AAYb548yEOtSfj/mPAfbJA==
+
+"@medusajs/admin-shared@2.7.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@medusajs/admin-shared/-/admin-shared-2.7.1.tgz#c5311559926d4c0b50d3df592ab971ab9abc1da4"
+  integrity sha512-CvFip6DNS6j5tbU695XAcQddV/SmSgegt4DPKBfVuEj1bdlFu8mY6La//ZCL3hqSa0S/Tf/fdvvf6DU9kAKgLg==
 
 "@medusajs/admin-vite-plugin@2.7.0":
   version "2.7.0"
@@ -2156,6 +2161,11 @@
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@medusajs/icons/-/icons-2.7.0.tgz#0c56495be3af17c578f3c1f17283a3f962e2f56c"
   integrity sha512-0PqVre5MDbGy96KbCHaQmtUwqqIVOGK6ZwtXcBQjN/sT8XH/dU839F+9u0yGknqt7VGr11vmGmRkv0fWCXuiZQ==
+
+"@medusajs/icons@2.7.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@medusajs/icons/-/icons-2.7.1.tgz#bba213644e7f702d1e417a92b0399f9205292b8f"
+  integrity sha512-UzSAHH+kKY5jjV4EUVugPD3NN6Ii2xEiGBpGWFF/kBEi9JhK5JAQcR+operus2hWcH1P4oToBbwuo69pEPyMeA==
 
 "@medusajs/index@2.7.0":
   version "2.7.0"
@@ -2395,6 +2405,25 @@
   integrity sha512-923Yk4ULgXFUI/qVeEorslSevLbtv9ruR4w59H6hJTc6WpB1ijkGk8jyq5EFM+fI7c97Zes/fvSp1bfrd9QnUw==
   dependencies:
     "@medusajs/icons" "2.7.0"
+    "@tanstack/react-table" "8.20.5"
+    clsx "^1.2.1"
+    copy-to-clipboard "^3.3.3"
+    cva "1.0.0-beta.1"
+    prism-react-renderer "^2.0.6"
+    prismjs "^1.29.0"
+    radix-ui "1.1.2"
+    react-aria "^3.33.1"
+    react-currency-input-field "^3.6.11"
+    react-stately "^3.31.1"
+    sonner "^1.5.0"
+    tailwind-merge "^2.2.1"
+
+"@medusajs/ui@^4.0.9":
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@medusajs/ui/-/ui-4.0.9.tgz#129a33b1ef073bbf945e6eca392c419aed0c2bc6"
+  integrity sha512-O4NuqshZ8mt8YRXERgoejDoGuMkf/U6qXaXowgBybeDzNFA3HiZsHtYYHoogcn4YxlIm7KIf8anaKStZZuXW8A==
+  dependencies:
+    "@medusajs/icons" "2.7.1"
     "@tanstack/react-table" "8.20.5"
     clsx "^1.2.1"
     copy-to-clipboard "^3.3.3"
