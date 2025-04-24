@@ -1,159 +1,147 @@
-// src/admin/routes/promo-banners/page.tsx
-
-import React, { useState, useMemo } from "react"
+// src/admin/routes/promo-banners/new/page.tsx
+import React, { useState } from "react"
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { useNavigate } from "react-router-dom"
 import {
   Container,
   Heading,
-  DataTable,
-  createDataTableColumnHelper,
-  DataTablePaginationState,
-  useDataTable,
   Button,
   Input,
-  Checkbox,
-  Badge,
+  Textarea,
+  Label,
+  Field,
+  DateTimePicker,
   Divider,
-  Alert,
 } from "@medusajs/ui"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "react-router-dom"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-export const config = defineRouteConfig({
-  label: "Promo Banners",
-})
+export const config = defineRouteConfig({ label: "New Promo Banner" })
 
-type Banner = {
-  id: string
-  text: string
-  bg_color: string
-  has_button: boolean
-  button_text?: string
-  button_color?: string
-  button_link?: string
-  starts_at: string
-  ends_at: string
-  priority: number
-}
-
-const columnHelper = createDataTableColumnHelper<Banner>()
-const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={table.getToggleAllPageRowsSelectedHandler()}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  },
-  columnHelper.accessor("text", { header: "Text" }),
-  columnHelper.accessor("bg_color", { header: "Background Color" }),
-  columnHelper.accessor("has_button", {
-    header: "Has Button",
-    cell: info => (
-      info.getValue() ? <Badge>Yes</Badge> : <Badge variant="secondary">No</Badge>
-    ),
-  }),
-  columnHelper.accessor("starts_at", { header: "Starts At" }),
-  columnHelper.accessor("ends_at", { header: "Ends At" }),
-  columnHelper.accessor("priority", { header: "Priority" }),
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => (
-      <Button
-        size="sm"
-        variant="secondary"
-        onClick={() => navigate(`/promo-banners/${row.original.id}/edit`)}
-      >
-        Edit
-      </Button>
-    ),
-  },
-]
-
-export default function PromoBannersPage() {
+export default function NewPromoBannerPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
-  const [pagination, setPagination] = useState<DataTablePaginationState>({ pageIndex: 0, pageSize: 10 })
-  const offset = useMemo(() => pagination.pageIndex * pagination.pageSize, [pagination])
-  const limit = pagination.pageSize
-  const [tab, setTab] = useState<'active' | 'upcoming' | 'expired'>('active')
-  const [search, setSearch] = useState<string>("")
 
-  const { data, error, isLoading } = useQuery({
-    queryKey: ['promo-banners', offset, limit, tab, search],
-    queryFn: async (): Promise<{ banners: Banner[]; count: number }> => {
-      const params = new URLSearchParams({
-        offset: String(offset),
-        limit: String(limit),
-        filter: tab,
-        search,
+  // lokální state pro formulář
+  const [text, setText] = useState("")
+  const [bgColor, setBgColor] = useState("#ffffff")
+  const [buttonText, setButtonText] = useState("")
+  const [buttonLink, setButtonLink] = useState("")
+  const [startsAt, setStartsAt] = useState<Date>(new Date())
+  const [endsAt, setEndsAt] = useState<Date>(new Date(Date.now() + 3600_000))
+  const [priority, setPriority] = useState(0)
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        text,
+        bg_color: bgColor,
+        button_text: buttonText || null,
+        button_link: buttonLink || null,
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        priority,
+      }
+      const res = await fetch("/admin/custom/promo-banners", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       })
-      const res = await fetch(`/admin/custom/promo-banners?${params}`, { credentials: 'include' })
       if (!res.ok) {
         throw new Error(await res.text())
       }
       return res.json()
     },
-    keepPreviousData: true,
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: async (ids: string[]) => {
-      await Promise.all(
-        ids.map(id => fetch(`/admin/custom/promo-banners/${id}`, { method: 'DELETE', credentials: 'include' }))
-      )
+    onSuccess: () => {
+      qc.invalidateQueries(["promo-banners"])
+      navigate("/promo-banners")
     },
-    onSuccess: () => qc.invalidateQueries(['promo-banners']),
   })
 
-  const table = useDataTable({
-    columns,
-    data: data?.banners || [],
-    rowCount: data?.count || 0,
-    getRowId: row => row.id,
-    isLoading,
-    pagination: { state: pagination, onPaginationChange: setPagination },
-    enableRowSelection: true,
-  })
-
-  const selectedIds = table.getRowModel().rows
-    .filter(row => row.getIsSelected())
-    .map(row => row.original.id)
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    createMutation.mutate()
+  }
 
   return (
-    <Container className="p-6">
-      <div className="flex justify-between items-center">
-        <Heading level="h2">Promo Banners</Heading>
-        <Button onClick={() => navigate('/promo-banners/new')}>New Banner</Button>
-      </div>
-
-      <div className="flex gap-4 items-center mt-4">
-        <Button variant={tab === 'active' ? 'primary' : 'secondary'} onClick={() => setTab('active')}>Active</Button>
-        <Button variant={tab === 'upcoming' ? 'primary' : 'secondary'} onClick={() => setTab('upcoming')}>Upcoming</Button>
-        <Button variant={tab === 'expired' ? 'primary' : 'secondary'} onClick={() => setTab('expired')}>Expired</Button>
-        <Input placeholder="Search text..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1" />
-        <Button variant="danger" disabled={!selectedIds.length} onClick={() => {
-          if (confirm(`Delete ${selectedIds.length} banners?`)) deleteMutation.mutate(selectedIds)
-        }}>Delete Selected</Button>
-      </div>
-
+    <Container className="p-6 max-w-lg">
+      <Heading level="h1">New Promo Banner</Heading>
       <Divider className="my-4" />
 
-      {error && <Alert variant="error" dismissible>{error.message}</Alert>}
+      <form onSubmit={onSubmit} className="space-y-4">
+        <Field>
+          <Label>Text</Label>
+          <Textarea
+            required
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Write banner text…"
+          />
+        </Field>
 
-      <DataTable instance={table}>
-        <DataTable.Table />
-        <DataTable.Pagination />
-      </DataTable>
+        <Field>
+          <Label>Background Color</Label>
+          <Input
+            type="color"
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+          />
+        </Field>
+
+        <Field>
+          <Label>Button Text</Label>
+          <Input
+            value={buttonText}
+            onChange={(e) => setButtonText(e.target.value)}
+            placeholder="Optional"
+          />
+        </Field>
+
+        <Field>
+          <Label>Button Link</Label>
+          <Input
+            type="url"
+            value={buttonLink}
+            onChange={(e) => setButtonLink(e.target.value)}
+            placeholder="https://…"
+          />
+        </Field>
+
+        <Field>
+          <Label>Starts At</Label>
+          <DateTimePicker
+            value={startsAt}
+            onChange={(d) => d && setStartsAt(d)}
+          />
+        </Field>
+
+        <Field>
+          <Label>Ends At</Label>
+          <DateTimePicker
+            value={endsAt}
+            onChange={(d) => d && setEndsAt(d)}
+          />
+        </Field>
+
+        <Field>
+          <Label>Priority (lower = higher)</Label>
+          <Input
+            type="number"
+            value={priority}
+            onChange={(e) => setPriority(Number(e.target.value))}
+            min={0}
+          />
+        </Field>
+
+        <div className="flex space-x-2 pt-4">
+          <Button type="button" variant="secondary" onClick={() => navigate(-1)}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={createMutation.isLoading}>
+            {createMutation.isLoading ? "Saving…" : "Save Banner"}
+          </Button>
+        </div>
+      </form>
     </Container>
   )
 }
